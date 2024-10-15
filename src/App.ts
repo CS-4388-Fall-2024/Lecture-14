@@ -5,12 +5,15 @@
  */ 
 
 import * as gfx from 'gophergfx'
+import {GUI} from 'dat.gui'
 
 export class App extends gfx.GfxApp
 {
     private cameraControls: gfx.OrbitControls;
 
     private character: gfx.Node3;
+
+    private morphAlpha: number;
 
     // --- Create the App class ---
     constructor()
@@ -21,6 +24,8 @@ export class App extends gfx.GfxApp
         this.cameraControls = new gfx.OrbitControls(this.camera);
 
         this.character = new gfx.Node3();
+
+        this.morphAlpha = 0;
     }
 
 
@@ -101,6 +106,13 @@ export class App extends gfx.GfxApp
             
         this.scene.add(this.character);
 
+        const gui = new GUI();
+
+        gui.width = 200;
+
+        const morphController = gui.add(this, 'morphAlpha', 0, 1);
+        morphController.name('Alpha');
+
     }
 
     
@@ -108,6 +120,12 @@ export class App extends gfx.GfxApp
     update(deltaTime: number): void 
     {
         this.cameraControls.update(deltaTime);
+
+        for (let i=0; i< this.character.children.length; i++){
+            const morphMesh = this.character.children[i] as gfx.MorphMesh3;
+            morphMesh.morphAlpha = this.morphAlpha;
+        }
+
     }
 
     private loadMorphMesh(meshFile1: string, meshFile2: string, textureFile: string): gfx.MorphMesh3
@@ -124,9 +142,9 @@ export class App extends gfx.GfxApp
             morphMesh.triangleCount = loadedMesh.triangleCount;
         });
         
-        gfx.MeshLoader.loadOBJ(meshFile1, (loadedMesh: gfx.Mesh3) => {
-            morphMesh.positionBuffer = loadedMesh.positionBuffer;
-            morphMesh.normalBuffer = loadedMesh.normalBuffer;
+        gfx.MeshLoader.loadOBJ(meshFile2, (loadedMesh: gfx.Mesh3) => {
+            morphMesh.morphTargetPositionBuffer = loadedMesh.positionBuffer;
+            morphMesh.morphTargetNormalBuffer = loadedMesh.normalBuffer;
         });
 
         morphMesh.material.texture = new gfx.Texture(textureFile);
