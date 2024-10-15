@@ -10,6 +10,8 @@ export class App extends gfx.GfxApp
 {
     private cameraControls: gfx.OrbitControls;
 
+    private character: gfx.Node3;
+
     // --- Create the App class ---
     constructor()
     {
@@ -17,6 +19,8 @@ export class App extends gfx.GfxApp
         super();
 
         this.cameraControls = new gfx.OrbitControls(this.camera);
+
+        this.character = new gfx.Node3();
     }
 
 
@@ -35,7 +39,7 @@ export class App extends gfx.GfxApp
         const ambientLight = new gfx.AmbientLight(new gfx.Color(0.25, 0.25, 0.25));
         this.scene.add(ambientLight);
 
-        // Create a directional light
+        // Create a point light
         const pointLight = new gfx.PointLight(new gfx.Color(1.25, 1.25, 1.25));
         pointLight.position.set(2, 1, 3)
         this.scene.add(pointLight);
@@ -45,6 +49,58 @@ export class App extends gfx.GfxApp
         ground.material.setColor(new gfx.Color(0, 0.5, 0.5));
         ground.position.y = -0.5;
         this.scene.add(ground);
+
+        
+
+        // const mesh = gfx.MeshLoader.loadOBJ('./assets/LinkBody1.obj');
+        // const material = new gfx.GouraudMaterial();
+        // material.texture = new gfx.Texture('./assets/LinkBody.png');
+        // mesh.material = material;
+        
+        this.character.add(this.loadMorphMesh(
+            './assets/LinkBody1.obj', 
+            './assets/LinkBody2.obj', 
+            './assets/LinkBody.png'
+            ));
+            
+            this.character.add(this.loadMorphMesh(
+            './assets/LinkEquipment1.obj', 
+            './assets/LinkEquipment2.obj', 
+            './assets/LinkEquipment.png'
+            ));
+            
+            this.character.add(this.loadMorphMesh(
+            './assets/LinkEyes1.obj', 
+            './assets/LinkEyes2.obj', 
+            './assets/LinkEyes.png'
+            ));
+            
+            this.character.add(this.loadMorphMesh(
+            './assets/LinkFace1.obj', 
+            './assets/LinkFace2.obj', 
+            './assets/LinkSkin.png'
+            ));
+            
+            this.character.add(this.loadMorphMesh(
+            './assets/LinkHair1.obj', 
+            './assets/LinkHair2.obj', 
+            './assets/LinkBody.png'
+            ));
+            
+            this.character.add(this.loadMorphMesh(
+            './assets/LinkHands1.obj', 
+            './assets/LinkHands2.obj', 
+            './assets/LinkSkin.png'
+            ));
+            
+            this.character.add(this.loadMorphMesh(
+            './assets/LinkMouth1.obj', 
+            './assets/LinkMouth2.obj', 
+            './assets/LinkBody.png'
+            ));
+            
+        this.scene.add(this.character);
+
     }
 
     
@@ -53,4 +109,30 @@ export class App extends gfx.GfxApp
     {
         this.cameraControls.update(deltaTime);
     }
+
+    private loadMorphMesh(meshFile1: string, meshFile2: string, textureFile: string): gfx.MorphMesh3
+    {
+    
+        const morphMesh = new gfx.MorphMesh3();
+
+        gfx.MeshLoader.loadOBJ(meshFile1, (loadedMesh: gfx.Mesh3) => {
+            morphMesh.positionBuffer = loadedMesh.positionBuffer;
+            morphMesh.normalBuffer = loadedMesh.normalBuffer;
+            morphMesh.texCoordBuffer = loadedMesh.texCoordBuffer;
+            morphMesh.indexBuffer = loadedMesh.indexBuffer;
+            morphMesh.vertexCount = loadedMesh.vertexCount;
+            morphMesh.triangleCount = loadedMesh.triangleCount;
+        });
+        
+        gfx.MeshLoader.loadOBJ(meshFile1, (loadedMesh: gfx.Mesh3) => {
+            morphMesh.positionBuffer = loadedMesh.positionBuffer;
+            morphMesh.normalBuffer = loadedMesh.normalBuffer;
+        });
+
+        morphMesh.material.texture = new gfx.Texture(textureFile);
+
+        return morphMesh;
+
+    }
+
 }
